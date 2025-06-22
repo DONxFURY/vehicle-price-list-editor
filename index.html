@@ -2,18 +2,102 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>FiveM Car Price List Creator</title>
+    <title>🚗 Car Price List Generator | Futuristic Edition</title>
     <style>
-        body { font-family: Arial; background: #1e1e1e; color: #fff; padding: 20px; }
-        input, select, button { margin: 5px 0; padding: 8px; width: 100%; }
-        textarea { width: 100%; height: 200px; margin-top: 10px; }
-        .container { max-width: 600px; margin: auto; }
+        body {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: #0ff;
+            font-family: 'Orbitron', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+
+        .container {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid #0ff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 0 20px #0ff;
+            width: 400px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        h2 {
+            text-align: center;
+            color: #0ff;
+            margin-bottom: 20px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 6px 0;
+            background: #111;
+            color: #0ff;
+            border: 1px solid #0ff;
+            border-radius: 6px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            background: #222;
+            box-shadow: 0 0 10px #0ff;
+        }
+
+        button {
+            width: 48%;
+            padding: 10px;
+            margin: 6px 1%;
+            background: #0ff;
+            color: #111;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #00f0f0;
+            box-shadow: 0 0 15px #0ff;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            background: #111;
+            color: #0ff;
+            border: 1px solid #0ff;
+            border-radius: 6px;
+            margin-top: 10px;
+            padding: 10px;
+            resize: none;
+        }
+
+        small {
+            color: #888;
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
+
 <div class="container">
-    <h2>Create FiveM Car Price List</h2>
-    
+    <h2>🚗 Car Price List Generator</h2>
+
     <input type="text" id="model" placeholder="Model (e.g., camshl1k)">
     <input type="text" id="name" placeholder="Name (e.g., Camshl1k)">
     <input type="text" id="brand" placeholder="Brand (default: Custom)" value="Custom">
@@ -21,11 +105,14 @@
     <input type="text" id="category" placeholder="Category (e.g., offroad)">
     <input type="text" id="type" placeholder="Type (e.g., automobile)">
     <input type="text" id="shop" placeholder="Shop (e.g., luxury)" value="luxury">
-    
-    <button onclick="addCar()">Add Car</button>
-    <button onclick="exportList()">Export List</button>
+
+    <div style="display: flex; justify-content: space-between;">
+        <button onclick="addCar()">Add Car</button>
+        <button onclick="exportList()">Export List</button>
+    </div>
 
     <textarea id="output" readonly></textarea>
+    <small>✨ Designed for FiveM Car Shops - Futuristic Edition ✨</small>
 </div>
 
 <script>
@@ -38,32 +125,37 @@
         const price = document.getElementById('price').value.trim();
         const category = document.getElementById('category').value.trim();
         const type = document.getElementById('type').value.trim();
-        const shop = document.getElementById('shop').value.trim();
+        const shop = document.getElementById('shop').value.trim() || 'luxury';
 
         if (!model || !name || !price || !category || !type || !shop) {
-            alert('Please fill all required fields.');
+            alert('⚠️ Please fill in all fields!');
             return;
         }
 
         const car = `{ model = '${model}', name = '${name}', brand = '${brand}', price = ${price}, category = '${category}', type = '${type}', shop = '${shop}' }`;
         cars.push(car);
         document.getElementById('output').value = cars.join(',\n');
-        
-        // Clear fields
-        document.getElementById('model').value = '';
-        document.getElementById('name').value = '';
-        document.getElementById('price').value = '';
-        document.getElementById('category').value = '';
-        document.getElementById('type').value = '';
+
+        // Clear inputs after adding
+        ['model', 'name', 'price', 'category', 'type'].forEach(id => document.getElementById(id).value = '');
     }
 
     function exportList() {
+        if(cars.length === 0){
+            alert('⚠️ No cars added yet!');
+            return;
+        }
+
         const blob = new Blob([cars.join(',\n')], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'car_price_list.txt';
+        link.href = url;
+        link.download = 'Car_Price_List.txt';
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
     }
 </script>
+
 </body>
 </html>
