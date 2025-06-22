@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FiveM Car Price List Creator</title>
+    <style>
+        body { font-family: Arial; background: #1e1e1e; color: #fff; padding: 20px; }
+        input, select, button { margin: 5px 0; padding: 8px; width: 100%; }
+        textarea { width: 100%; height: 200px; margin-top: 10px; }
+        .container { max-width: 600px; margin: auto; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Create FiveM Car Price List</h2>
+    
+    <input type="text" id="model" placeholder="Model (e.g., camshl1k)">
+    <input type="text" id="name" placeholder="Name (e.g., Camshl1k)">
+    <input type="text" id="brand" placeholder="Brand (default: Custom)" value="Custom">
+    <input type="number" id="price" placeholder="Price (e.g., 55000)">
+    <input type="text" id="category" placeholder="Category (e.g., offroad)">
+    <input type="text" id="type" placeholder="Type (e.g., automobile)">
+    <input type="text" id="shop" placeholder="Shop (e.g., luxury)" value="luxury">
+    
+    <button onclick="addCar()">Add Car</button>
+    <button onclick="exportList()">Export List</button>
+
+    <textarea id="output" readonly></textarea>
+</div>
+
+<script>
+    const cars = [];
+
+    function addCar() {
+        const model = document.getElementById('model').value.trim();
+        const name = document.getElementById('name').value.trim();
+        const brand = document.getElementById('brand').value.trim() || 'Custom';
+        const price = document.getElementById('price').value.trim();
+        const category = document.getElementById('category').value.trim();
+        const type = document.getElementById('type').value.trim();
+        const shop = document.getElementById('shop').value.trim();
+
+        if (!model || !name || !price || !category || !type || !shop) {
+            alert('Please fill all required fields.');
+            return;
+        }
+
+        const car = `{ model = '${model}', name = '${name}', brand = '${brand}', price = ${price}, category = '${category}', type = '${type}', shop = '${shop}' }`;
+        cars.push(car);
+        document.getElementById('output').value = cars.join(',\n');
+        
+        // Clear fields
+        document.getElementById('model').value = '';
+        document.getElementById('name').value = '';
+        document.getElementById('price').value = '';
+        document.getElementById('category').value = '';
+        document.getElementById('type').value = '';
+    }
+
+    function exportList() {
+        const blob = new Blob([cars.join(',\n')], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'car_price_list.txt';
+        link.click();
+    }
+</script>
+</body>
+</html>
