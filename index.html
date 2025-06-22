@@ -2,21 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>🚗 Car Price List Generator | Futuristic Edition</title>
+    <title>🚗 Car Price List Editor | Futuristic Pro</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
         body {
-            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
-            color: #0ff;
+            background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
             font-family: 'Orbitron', sans-serif;
+            color: #0ff;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
         }
-
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
-
         .container {
             background: rgba(0, 255, 255, 0.05);
             border: 1px solid #0ff;
@@ -26,19 +24,15 @@
             width: 400px;
             animation: float 3s ease-in-out infinite;
         }
-
         @keyframes float {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
         }
-
         h2 {
             text-align: center;
-            color: #0ff;
             margin-bottom: 20px;
         }
-
-        input, select {
+        input, button {
             width: 100%;
             padding: 10px;
             margin: 6px 0;
@@ -49,30 +43,20 @@
             outline: none;
             transition: 0.3s;
         }
-
         input:focus {
             background: #222;
             box-shadow: 0 0 10px #0ff;
         }
-
         button {
-            width: 48%;
-            padding: 10px;
-            margin: 6px 1%;
             background: #0ff;
             color: #111;
-            border: none;
-            border-radius: 6px;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.3s;
         }
-
         button:hover {
             background: #00f0f0;
             box-shadow: 0 0 15px #0ff;
         }
-
         textarea {
             width: 100%;
             height: 150px;
@@ -84,7 +68,6 @@
             padding: 10px;
             resize: none;
         }
-
         small {
             color: #888;
             display: block;
@@ -94,9 +77,10 @@
     </style>
 </head>
 <body>
-
 <div class="container">
-    <h2>🚗 Car Price List Generator</h2>
+    <h2>🚗 Car Price List Editor</h2>
+
+    <input type="file" id="importFile" accept=".txt" onchange="importList()">
 
     <input type="text" id="model" placeholder="Model (e.g., camshl1k)">
     <input type="text" id="name" placeholder="Name (e.g., Camshl1k)">
@@ -106,17 +90,15 @@
     <input type="text" id="type" placeholder="Type (e.g., automobile)">
     <input type="text" id="shop" placeholder="Shop (e.g., luxury)" value="luxury">
 
-    <div style="display: flex; justify-content: space-between;">
-        <button onclick="addCar()">Add Car</button>
-        <button onclick="exportList()">Export List</button>
-    </div>
+    <button onclick="addCar()">Add Car</button>
+    <button onclick="exportList()">Export List</button>
 
     <textarea id="output" readonly></textarea>
-    <small>✨ Designed for FiveM Car Shops - Futuristic Edition ✨</small>
+    <small>✨ Import .txt, Edit & Export your FiveM Price List ✨</small>
 </div>
 
 <script>
-    const cars = [];
+    let cars = [];
 
     function addCar() {
         const model = document.getElementById('model').value.trim();
@@ -128,24 +110,27 @@
         const shop = document.getElementById('shop').value.trim() || 'luxury';
 
         if (!model || !name || !price || !category || !type || !shop) {
-            alert('⚠️ Please fill in all fields!');
+            alert('⚠️ Please fill all fields!');
             return;
         }
 
         const car = `{ model = '${model}', name = '${name}', brand = '${brand}', price = ${price}, category = '${category}', type = '${type}', shop = '${shop}' }`;
         cars.push(car);
-        document.getElementById('output').value = cars.join(',\n');
+        updateOutput();
 
-        // Clear inputs after adding
+        // Clear fields
         ['model', 'name', 'price', 'category', 'type'].forEach(id => document.getElementById(id).value = '');
+    }
+
+    function updateOutput() {
+        document.getElementById('output').value = cars.join(',\n');
     }
 
     function exportList() {
         if(cars.length === 0){
-            alert('⚠️ No cars added yet!');
+            alert('⚠️ No cars to export!');
             return;
         }
-
         const blob = new Blob([cars.join(',\n')], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -155,7 +140,21 @@
         link.click();
         document.body.removeChild(link);
     }
-</script>
 
+    function importList() {
+        const file = document.getElementById('importFile').files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const content = e.target.result;
+            const lines = content.split(/\r?\n/).filter(line => line.trim().startsWith('{') && line.trim().endsWith('}'));
+            cars = lines;
+            updateOutput();
+            alert('✅ Import successful! You can now edit or add more items.');
+        };
+        reader.readAsText(file);
+    }
+</script>
 </body>
 </html>
