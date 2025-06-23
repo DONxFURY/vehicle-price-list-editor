@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚀 Car Price List Editor | Futuristic Pro</title>
+    <title>🚀 Car Price List Editor | Professional Edition</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -402,6 +402,16 @@
             font-size: 0.9rem;
         }
 
+        .import-format {
+            background: rgba(0, 0, 0, 0.2);
+            border-left: 3px solid var(--primary);
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
         @media (max-width: 768px) {
             .container {
                 flex-direction: column;
@@ -504,6 +514,11 @@
                 </button>
             </div>
             
+            <div class="import-format">
+                <div><i class="fas fa-info-circle"></i> Supported import format:</div>
+                <div>{ model = 'Camshl1k', name = 'Camshl1k', brand = 'Custom', price = 55000, ... }</div>
+            </div>
+            
             <input type="file" id="importFile" accept=".txt" style="display: none;">
         </div>
         
@@ -552,7 +567,7 @@
     </div>
     
     <div class="footer">
-        <p>✨ Futuristic Car Price List Editor v2.0 | Made for FiveM Developers ✨</p>
+        <p>✨ Professional Car Price List Editor v2.0 | Made for FiveM Developers ✨</p>
     </div>
 
     <div id="notification" class="notification">
@@ -707,7 +722,7 @@
                 try {
                     const content = e.target.result;
                     const lines = content.split(/\r?\n/).filter(line => 
-                        line.trim().startsWith('{') && line.trim().endsWith('}')
+                        line.trim().startsWith('{') && (line.trim().endsWith('}') || line.trim().endsWith('},'))
                     );
                     
                     if (lines.length === 0) {
@@ -716,21 +731,30 @@
                     }
                     
                     const importedCars = lines.map(line => {
-                        // Simple parsing of the Lua-like table
-                        const match = line.match(/model\s*=\s*'([^']+)',\s*name\s*=\s*'([^']+)',\s*brand\s*=\s*'([^']+)',\s*price\s*=\s*(\d+),\s*category\s*=\s*'([^']+)',\s*type\s*=\s*'([^']+)',\s*shop\s*=\s*'([^']+)'/);
+                        // Remove any trailing commas
+                        let cleanLine = line.trim();
+                        if (cleanLine.endsWith(',')) {
+                            cleanLine = cleanLine.slice(0, -1).trim();
+                        }
                         
-                        if (!match) return null;
+                        // Extract key-value pairs
+                        const car = {};
+                        const pairs = cleanLine.slice(1, -1).split(',').map(pair => pair.trim());
                         
-                        return {
-                            model: match[1],
-                            name: match[2],
-                            brand: match[3],
-                            price: parseInt(match[4]),
-                            category: match[5],
-                            type: match[6],
-                            shop: match[7]
-                        };
-                    }).filter(car => car !== null);
+                        for (const pair of pairs) {
+                            const [key, value] = pair.split('=').map(part => part.trim());
+                            if (!key || !value) continue;
+                            
+                            if (value.startsWith("'") && value.endsWith("'")) {
+                                car[key] = value.slice(1, -1);
+                            } else {
+                                const num = Number(value);
+                                car[key] = isNaN(num) ? value : num;
+                            }
+                        }
+                        
+                        return car;
+                    }).filter(car => car.model && car.name && car.price);
                     
                     if (importedCars.length === 0) {
                         showNotification('No valid car entries found!', 'error');
